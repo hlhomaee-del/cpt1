@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CPT Modifier Simulation Lab</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1f2340;
+    --muted:#5b6285;
+    --line:#e9ebff;
+    --card:#ffffff;
+    --shadow:0 18px 45px rgba(57,73,171,.12);
+    --grad1:linear-gradient(135deg,#7c4dff 0%,#5ec7ff 100%);
+    --grad2:linear-gradient(135deg,#ff6ea8 0%,#ffb36b 100%);
+    --grad3:linear-gradient(135deg,#31d0aa 0%,#7be495 100%);
+    --grad4:linear-gradient(135deg,#ffd166 0%,#ff8c42 100%);
+    --grad5:linear-gradient(135deg,#6a8dff 0%,#9b5cff 100%);
+    --good:#22a35a;
+    --bad:#d44a58;
+    --warn:#b37400;
+    --chip:#f5f7ff;
+    --sec1a:#f4ecff; --sec1b:#e9f7ff;
+    --sec2a:#eef4ff; --sec2b:#f4edff;
+    --sec3a:#fff0f7; --sec3b:#efeaff;
+    --sec4a:#eafff7; --sec4b:#ecf4ff;
+    --sec5a:#fff7e8; --sec5b:#ffeef5;
+    --sec6a:#eefbff; --sec6b:#eef0ff;
+    --sec7a:#f0fff2; --sec7b:#fff4ea;
+    --sec8a:#f6f0ff; --sec8b:#eefcff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;scroll-behavior:smooth}
+  body{overflow-x:hidden}
+  button,input,select,textarea{font:inherit}
+  .topbar{
+    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{max-width:1200px;margin:auto;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 18px}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .logo{
+    width:44px;height:44px;border-radius:14px;background:var(--grad1);display:grid;place-items:center;
+    color:#fff;font-weight:900;box-shadow:var(--shadow)
+  }
+  .brand h1{font-size:1.02rem;margin:0;line-height:1.15}
+  .brand small{display:block;color:var(--muted)}
+  .nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .pill{
+    border:none;border-radius:999px;padding:10px 14px;background:var(--chip);cursor:pointer;
+    color:var(--ink);font-weight:700;transition:.22s transform,.22s box-shadow,.22s opacity;
+  }
+  .pill:hover,.btn:hover,.choice:hover,.navbtn:hover,.mini:hover,.tile:hover,.flash:hover,.case-card:hover,.calc-cell:hover,.bucket:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(80,90,160,.15);
+  }
+  .sound-on{background:var(--grad3);color:#113428}
+  .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 70px}
+  .hero{
+    position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:26px;
+    background:
+      radial-gradient(circle at 10% 20%, rgba(124,77,255,.12), transparent 22%),
+      radial-gradient(circle at 90% 15%, rgba(255,110,168,.12), transparent 18%),
+      radial-gradient(circle at 80% 85%, rgba(49,208,170,.12), transparent 22%),
+      linear-gradient(180deg,#ffffff 0%,#fbfcff 100%);
+    box-shadow:var(--shadow);
+  }
+  .hero-grid{display:grid;grid-template-columns:1.2fr .9fr;gap:18px;align-items:center}
+  .hero h2{font-size:2rem;line-height:1.05;margin:0 0 12px}
+  .hero p{font-size:1.02rem;color:var(--muted);margin:0 0 14px;max-width:72ch}
+  .hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .badge{
+    padding:8px 12px;border-radius:999px;color:#fff;font-weight:800;font-size:.92rem;
+    box-shadow:0 10px 24px rgba(80,90,160,.12)
+  }
+  .g1{background:var(--grad1)} .g2{background:var(--grad2)} .g3{background:var(--grad3)}
+  .g4{background:var(--grad4)} .g5{background:var(--grad5)}
+  .hero-side{display:grid;gap:12px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .stat{
+    background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow)
+  }
+  .stat strong{display:block;font-size:1.35rem}
+  .section{display:none;animation:fadeUp .45s ease}
+  .section.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .grid{display:grid;gap:16px}
+  .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(255,255,255,.72) 100%);
+    border:1px solid rgba(226,231,255,.95);
+    border-radius:24px;
+    padding:18px;
+    box-shadow:
+      0 20px 45px rgba(57,73,171,.12),
+      inset 0 1px 0 rgba(255,255,255,.7);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px)
+  }
+  .title-row{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+  .title-row h3,.title-row h4{margin:0}
+  .lede{color:var(--muted);margin:.35rem 0 0}
+  .btn, .navbtn, .choice, .mini{
+    border:none;cursor:pointer;transition:.2s transform,.2s box-shadow,.2s opacity;
+  }
+  .btn{
+    padding:12px 16px;border-radius:16px;font-weight:800;color:#fff;background:var(--grad1)
+  }
+  .btn.alt{background:var(--grad2)}
+  .btn.green{background:var(--grad3);color:#103728}
+  .btn.gold{background:var(--grad4);color:#4d2d00}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .navrow{
+    display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+    margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)
+  }
+  .navbtn{
+    padding:11px 16px;border-radius:14px;background:#fff;color:var(--ink);border:1px solid var(--line);font-weight:800
+  }
+  .progress-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .progress{
+    width:min(420px,74vw);height:14px;background:#eff2ff;border-radius:999px;overflow:hidden;border:1px solid var(--line)
+  }
+  .bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,#7c4dff,#5ec7ff,#31d0aa,#ffd166,#ff8c42);
+    transition:width .35s ease;
+  }
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;background:var(--chip);padding:8px 12px;border-radius:999px;
+    border:1px solid var(--line);color:var(--ink);font-weight:700
+  }
+  .chips{display:flex;gap:10px;flex-wrap:wrap}
+  .tile{
+    border-radius:22px;
+    padding:16px;
+    border:1px solid rgba(220,226,255,.95);
+    background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.76) 100%);
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      0 14px 30px rgba(74,88,170,.10),
+      inset 0 1px 0 rgba(255,255,255,.8)
+  }
+  .tile::after{
+    content:"";position:absolute;inset:auto -10px -10px auto;width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle, rgba(124,77,255,.14), transparent 64%);
+  }
+  .tile h4{margin:0 0 8px}
+  .muted{color:var(--muted)}
+  .highlight{font-weight:900;color:#6a34ff}
+  .note{
+    background:#fff9e8;border:1px solid #ffe1a0;color:#6b4a00;padding:12px 14px;border-radius:16px
+  }
+  .choice-wrap{display:grid;gap:12px;margin-top:14px}
+  .choice{
+    width:100%;text-align:left;border-radius:18px;padding:14px 16px;background:#fff;border:1px solid var(--line);position:relative
+  }
+  .choice.correct{background:#ecfff3;border-color:#6cd29a}
+  .choice.wrong{background:#fff0f2;border-color:#f5a2af}
+  .choice.reveal-correct{outline:3px solid rgba(34,163,90,.18)}
+  .feedback{
+    margin-top:12px;padding:12px 14px;border-radius:16px;display:none
+  }
+  .feedback.good{display:block;background:#ecfff3;color:#165d35;border:1px solid #a2e0bf}
+  .feedback.bad{display:block;background:#fff1f3;color:#7f2230;border:1px solid #f4b0bb}
+  .feedback.warn{display:block;background:#fff8ea;color:#7a5200;border:1px solid #ffd27b}
+  .small{font-size:.95rem}
+  .flash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .flash{
+    perspective:1200px;cursor:pointer;height:220px;position:relative
+  }
+  .flash-inner{
+    position:absolute;inset:0;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.7,.2,1)
+  }
+  .flash.flipped .flash-inner{transform:rotateY(180deg)}
+  .flash-face{
+    position:absolute;inset:0;border-radius:22px;padding:18px;backface-visibility:hidden;box-shadow:var(--shadow);border:1px solid var(--line)
+  }
+  .flash-front{display:grid;place-items:center;text-align:center;color:#fff}
+  .flash-front h4{font-size:2rem;margin:0}
+  .flash-front p{margin:.5rem 0 0;font-weight:700}
+  .flash-back{background:#fff;transform:rotateY(180deg);overflow:auto}
+  .status-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .mini{
+    padding:8px 10px;border-radius:12px;background:#fff;border:1px solid var(--line);font-weight:800
+  }
+  .mini.known{background:#ecfff3;border-color:#8fd8ad;color:#17653a}
+  .mini.study{background:#fff8ea;border-color:#ffd27b;color:#805600}
+  .bucket-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .bucket{
+    min-height:150px;
+    border:2px dashed rgba(192,201,255,.9);
+    border-radius:24px;
+    padding:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(250,252,255,.92) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 14px 28px rgba(91,107,188,.08)
+  }
+  .bucket h4{margin:.1rem 0 .5rem}
+  .drag{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0;cursor:grab;
+    box-shadow:0 8px 18px rgba(93,107,180,.1)
+  }
+  .drag:active{cursor:grabbing}
+  .case-card,.calc-cell{
+    border:1px solid rgba(223,229,255,.95);
+    border-radius:18px;
+    padding:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.74) 100%);
+    box-shadow:0 12px 28px rgba(88,102,182,.10), inset 0 1px 0 rgba(255,255,255,.84)
+  }
+  .attempts{font-weight:800}
+  .hint-list{display:grid;gap:8px;margin-top:10px}
+  .hint{
+    background:#f6f8ff;border:1px solid var(--line);padding:10px 12px;border-radius:12px;display:none
+  }
+  .complex{
+    font-family:Georgia,serif;font-size:1rem;line-height:1.5;background:#fdfcff;border-left:5px solid #cdb9ff;
+    padding:14px 16px;border-radius:18px;border:1px solid #e7dfff
+  }
+  .table-like{display:grid;gap:10px}
+  .table-row{
+    display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px;align-items:stretch
+  }
+  .cell-head,.cell{
+    padding:12px 14px;border-radius:14px;border:1px solid var(--line)
+  }
+  .cell-head{background:#f6f8ff;font-weight:900}
+  .cell{background:#fff}
+  .select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #d8defa;
+    background:#fff;
+    color:#1f2340;
+    cursor:pointer;
+    position:relative;
+    z-index:5;
+    appearance:auto;
+    -webkit-appearance:menulist;
+    -moz-appearance:menulist;
+  }
+  .meter{
+    height:12px;background:#eef1ff;border-radius:999px;overflow:hidden;border:1px solid var(--line)
+  }
+  .meter > span{
+    display:block;height:100%;width:0;background:linear-gradient(90deg,#31d0aa,#7c4dff);transition:width .3s ease
+  }
+  textarea.summary-box{
+    width:100%;min-height:220px;border-radius:18px;border:1px solid var(--line);padding:14px;background:#fff
+  }
+  .footnote{
+    font-size:.92rem;color:var(--muted)
+  }
+  .fireworks{
+    position:fixed;inset:0;pointer-events:none;z-index:100
+  }
+  .pulse{
+    animation:pulse 1.15s infinite
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(124,77,255,.28)}
+    70%{box-shadow:0 0 0 16px rgba(124,77,255,0)}
+    100%{box-shadow:0 0 0 0 rgba(124,77,255,0)}
+  }
+  .sticky-nav-bottom{
+    position:sticky;bottom:0;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
+    padding-top:10px;margin-top:10px
+  }
+  .legend{display:flex;gap:8px;flex-wrap:wrap}
+  .legend span{padding:7px 10px;border-radius:999px;border:1px solid var(--line);font-size:.92rem;font-weight:700}
+  .green-bg{background:#ecfff3}
+  .red-bg{background:#fff0f2}
+  .yellow-bg{background:#fff8ea}
+  .blue-bg{background:#f3f7ff}
+  
+  .section-shell{
+    position:relative;
+    overflow:hidden;
+    border-radius:30px;
+    padding:22px;
+    margin-top:18px;
+    border:1px solid rgba(227,232,255,.95);
+    box-shadow:
+      0 24px 60px rgba(77,92,180,.10),
+      inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .section-shell::before,
+  .section-shell::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(10px);
+    opacity:.9;
+  }
+  .section-shell::before{
+    width:260px;height:260px;top:-70px;right:-50px;
+    background:radial-gradient(circle, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 68%);
+  }
+  .section-shell::after{
+    width:220px;height:220px;left:-60px;bottom:-70px;
+    background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 68%);
+  }
+  .section-theme-1{background:linear-gradient(135deg,var(--sec1a) 0%, var(--sec1b) 100%)}
+  .section-theme-2{background:linear-gradient(135deg,var(--sec2a) 0%, var(--sec2b) 100%)}
+  .section-theme-3{background:linear-gradient(135deg,var(--sec3a) 0%, var(--sec3b) 100%)}
+  .section-theme-4{background:linear-gradient(135deg,var(--sec4a) 0%, var(--sec4b) 100%)}
+  .section-theme-5{background:linear-gradient(135deg,var(--sec5a) 0%, var(--sec5b) 100%)}
+  .section-theme-6{background:linear-gradient(135deg,var(--sec6a) 0%, var(--sec6b) 100%)}
+  .section-theme-7{background:linear-gradient(135deg,var(--sec7a) 0%, var(--sec7b) 100%)}
+  .section-theme-8{background:linear-gradient(135deg,var(--sec8a) 0%, var(--sec8b) 100%)}
+  .section-ribbon{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 14px;
+    padding:9px 14px;
+    border-radius:999px;
+    font-weight:900;
+    letter-spacing:.02em;
+    background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.74) 100%);
+    border:1px solid rgba(225,231,255,.95);
+    box-shadow:0 10px 24px rgba(77,92,180,.10)
+  }
+  .section-ribbon .dot{
+    width:12px;height:12px;border-radius:50%;
+    box-shadow:0 0 0 6px rgba(255,255,255,.28)
+  }
+  .section-head{
+    border-radius:24px;
+    padding:18px 20px;
+    margin-bottom:16px;
+    color:#1d2242;
+    border:1px solid rgba(222,228,255,.95);
+    box-shadow:
+      0 16px 36px rgba(77,92,180,.12),
+      inset 0 1px 0 rgba(255,255,255,.72);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+  .section-head h3{margin:0 0 6px}
+  .section-head .lede{margin:0;color:#283056}
+  .head-2{background:linear-gradient(135deg,#edf3ff 0%, #f4eeff 100%)}
+  .head-3{background:linear-gradient(135deg,#fff0f7 0%, #f3ecff 100%)}
+  .head-4{background:linear-gradient(135deg,#eafff8 0%, #eef5ff 100%)}
+  .head-5{background:linear-gradient(135deg,#fff7ea 0%, #ffeff6 100%)}
+  .head-6{background:linear-gradient(135deg,#eefcff 0%, #eef0ff 100%)}
+  .head-7{background:linear-gradient(135deg,#f0fff2 0%, #fff4ea 100%)}
+  .head-8{background:linear-gradient(135deg,#f5efff 0%, #eefcff 100%)}
+  .logic-board{
+    display:grid;
+    gap:14px;
+    margin-top:14px;
+  }
+  .logic-row{
+    display:grid;
+    grid-template-columns:1.2fr .95fr .95fr;
+    gap:12px;
+    align-items:stretch;
+    border:1px solid rgba(225,231,255,.95);
+    border-radius:18px;
+    padding:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(247,249,255,.86) 100%);
+  }
+  .logic-label{
+    border-radius:16px;
+    padding:12px 14px;
+    background:#fff;
+    border:1px solid rgba(225,231,255,.95);
+  }
+  .logic-pick{
+    border-radius:16px;
+    padding:12px 14px;
+    border:1px solid rgba(225,231,255,.95);
+    background:#fff;
+  }
+  .signal{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:16px;
+    font-weight:900;
+    border:1px solid rgba(225,231,255,.95);
+    background:#fff8ea;
+    color:#7a5200;
+    min-height:56px;
+  }
+  .signal.good{
+    background:#ecfff3;
+    color:#17653a;
+    border-color:#9adbb6;
+  }
+  .signal.bad{
+    background:#fff0f2;
+    color:#8c2332;
+    border-color:#f3b0ba;
+  }
+  .signal.neutral{
+    background:#f3f7ff;
+    color:#28417e;
+    border-color:#cfdafd;
+  }
+  .bucket-bar{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:14px;
+  }
+  .bucket-slot{
+    border-radius:18px;
+    padding:14px 12px;
+    min-height:92px;
+    border:2px dashed rgba(198,207,255,.95);
+    background:linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(249,251,255,.86) 100%);
+    text-align:center;
+  }
+  .bucket-slot.active{
+    border-style:solid;
+    background:linear-gradient(180deg, #ecfff3 0%, #f7fff9 100%);
+    border-color:#8fd8ad;
+    color:#17653a;
+  }
+  .bucket-slot.inactive{
+    background:linear-gradient(180deg, #fff1f3 0%, #fff8f9 100%);
+    border-color:#efb0bb;
+    color:#8b2231;
+  }
+  .overall-tile{
+    margin-top:14px;
+    border-radius:22px;
+    padding:18px;
+    border:1px solid rgba(225,231,255,.95);
+    background:linear-gradient(135deg,#eefcff 0%, #f3efff 100%);
+    box-shadow:0 14px 28px rgba(88,102,182,.10);
+  }
+  .overall-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    font-weight:900;
+    background:#fff;
+    border:1px solid rgba(225,231,255,.95);
+  }
+  .level-chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:7px 11px;
+    border-radius:999px;
+    font-weight:900;
+    border:1px solid rgba(0,0,0,.06);
+    min-width:112px;
+  }
+  .level-straight{background:#ecfff3;color:#17653a;border-color:#98dbb4}
+  .level-low{background:#fff8cf;color:#7b6500;border-color:#ead97b}
+  .level-moderate{background:#fff0df;color:#a65300;border-color:#ffc58b}
+  .level-high{background:#ffe8eb;color:#99273a;border-color:#f3aab5}
+  .example-card{
+    border-radius:18px;
+    padding:14px;
+    border:1px solid rgba(225,231,255,.95);
+    background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(249,251,255,.88) 100%);
+    box-shadow:0 12px 28px rgba(88,102,182,.08);
+  }
+  .example-levels{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .mixer-board{
+    margin-top:16px;
+    border-radius:22px;
+    padding:18px;
+    border:1px solid rgba(225,231,255,.95);
+    background:linear-gradient(135deg,#ffffff 0%, #f8fbff 100%);
+    box-shadow:0 14px 28px rgba(88,102,182,.08);
+  }
+  .mixer-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:12px;
+  }
+  .mixer-col{
+    border-radius:18px;
+    padding:14px;
+    border:1px solid rgba(225,231,255,.95);
+    background:linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(248,250,255,.88) 100%);
+  }
+  .mixer-result{
+    margin-top:14px;
+    border-radius:20px;
+    padding:16px;
+    border:1px solid rgba(225,231,255,.95);
+    background:linear-gradient(135deg,#eefcff 0%, #f4efff 100%);
+  }
+  .result-band{
+    margin-top:10px;
+    min-height:54px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:1.02rem;
+    border:1px solid rgba(225,231,255,.95);
+  }
+  .sequence-board{
+    display:grid;
+    gap:14px;
+    margin-top:14px;
+  }
+  .sequence-targets{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .sequence-slot{
+    min-height:96px;
+    border-radius:20px;
+    padding:12px;
+    border:2px dashed rgba(198,207,255,.95);
+    background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(248,250,255,.88) 100%);
+  }
+  .sequence-slot h5{margin:0 0 8px}
+  .dropzone{
+    min-height:44px;
+    border-radius:12px;
+    background:#fff;
+    border:1px solid rgba(225,231,255,.95);
+    padding:8px;
+  }
+  .seq-card{
+    background:linear-gradient(135deg,#eef4ff 0%, #f6efff 100%);
+    border:1px solid rgba(205,216,255,.98);
+    border-radius:14px;
+    padding:10px 12px;
+    margin:8px 0;
+    cursor:grab;
+    font-weight:800;
+  }
+  .seq-card:active{cursor:grabbing}
+
+  @media (max-width:980px){
+    .hero-grid,.grid-2,.grid-3,.bucket-grid,.table-row{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:650px){
+    .stats{grid-template-columns:1fr}
+    .hero h2{font-size:1.55rem}
+    .topbar-inner{padding:10px 12px}
+  }
+</style>
+</head>
+<body>
+<canvas class="fireworks" id="fireworks"></canvas>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo">MX</div>
+      <div>
+        <h1>CPT Modifier Simulation Lab</h1>
+        <small>Interactive CBCS-style prep • white background • colorful practice • game mode</small>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="pill sound-on" id="soundToggle">🔊 Sound On</button>
+      <button class="pill" id="topPrev">← Previous page</button>
+      
+      <button class="pill" id="jumpSummary">Summary</button>
+      <div class="progress-wrap">
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="chip"><span id="pageLabel">Page 1 / 8</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="section active" data-page="1">
+    <div class="section-shell section-theme-1">
+    <div class="section-ribbon"><span class="dot" style="background:#7c4dff"></span> Welcome / orientation</div>
+    <div class="hero">
+      <div class="hero-grid">
+        <div>
+          <h2>Learn CPT modifiers like a <span class="highlight">coding detective</span>, not like a robot.</h2>
+          <p>
+            Learn <strong>CPT basics</strong>, <strong>modifier logic</strong>, and <strong>outpatient E/M level selection</strong>
+            using concept checks, case sorting, high-difficulty notes, guided hints, sound, animated feedback, and a copyable reflection summary.
+          </p>
+          <div class="hero-badges">
+            <span class="badge g1">Modifier mastery</span>
+            <span class="badge g2">NHA-style challenges</span>
+            <span class="badge g3">3 hints + reveal</span>
+            <span class="badge g4">E/M level builder</span>
+            <span class="badge g5">Copyable summary</span>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div class="stats">
+            <div class="stat">
+              <small class="muted">Current score</small>
+              <strong id="scoreHero">0</strong>
+              <span class="muted">points</span>
+            </div>
+            <div class="stat">
+              <small class="muted">Correct answers</small>
+              <strong id="correctHero">0</strong>
+              <span class="muted">so far</span>
+            </div>
+            <div class="stat">
+              <small class="muted">Hints used</small>
+              <strong id="hintHero">0</strong>
+              <span class="muted">across the lab</span>
+            </div>
+            <div class="stat">
+              <small class="muted">Confidence</small>
+              <strong id="confidenceHero">—</strong>
+              <span class="muted">set at the end</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="title-row"><h3>How this lab works</h3></div>
+            <div class="table-like">
+              <div class="tile"><h4>1. Learn</h4><div class="muted">Short teaching bursts with vivid examples and structure clues.</div></div>
+              <div class="tile"><h4>2. Test</h4><div class="muted">Click, sort, classify, and solve cases instead of passively reading.</div></div>
+              <div class="tile"><h4>3. Reflect</h4><div class="muted">Generate a teacher-ready summary to paste into Amplify.</div></div>
+            </div>
+          </div>
+          <div class="note">
+            <strong>Important:</strong> Use this as a training simulation. Base real coding on full documentation, payer edits, and current code-set guidance.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-3" style="margin-top:18px">
+      <div class="card">
+        <h3>What students should walk away with</h3>
+        <div class="chips">
+          <span class="chip">What CPT is</span>
+          <span class="chip">How a code is structured</span>
+          <span class="chip">What modifiers change</span>
+          <span class="chip">Which clue words matter</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Lab design</h3>
+        <p class="muted">White background, colorful cards, motion, sounds, guided navigation top and bottom, reveal mode after three hints/tries, and teacher-facing summary generation.</p>
+      </div>
+      <div class="card">
+        <h3>Reference anchor</h3>
+        <p class="muted">This lab aligns with current outpatient E/M logic: visit level by MDM or time, and modifier decisions that depend on the actual service story.</p>
+      </div>
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <span class="footnote">Tip: use the top progress bar to track where you are.</span>
+        <button class="btn" onclick="goTo(2)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="2">
+    <div class="section-shell section-theme-2">
+      <div class="section-ribbon"><span class="dot" style="background:#6a8dff"></span> CPT foundation</div>
+    <div class="card">
+      <div class="section-head head-2">
+        <h3>Page 2 • CPT foundation lab</h3>
+        <p class="lede">Learn the frame first: identify what CPT is, what a modifier does, and how to keep the base code separate from the extra story added after it.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Teach + check</span>
+          <span class="chip">Fast feedback</span>
+        </div>
+
+      <div class="grid grid-3" style="margin-top:14px">
+        <div class="tile">
+          <h4>What CPT does</h4>
+          <p class="muted">CPT is the main code set used to describe <strong>procedures and services</strong>. Think of the base code as the main service story.</p>
+        </div>
+        <div class="tile">
+          <h4>What a modifier does</h4>
+          <p class="muted">A modifier does <strong>not replace</strong> the base code. It adds a detail about <strong>circumstance, component, repetition, laterality, distinctness, or relationship</strong>.</p>
+        </div>
+        <div class="tile">
+          <h4>What students must notice</h4>
+          <p class="muted">Tiny wording shifts matter: <strong>same physician</strong>, <strong>another physician</strong>, <strong>same day</strong>, <strong>post-op period</strong>, <strong>reduced</strong>, <strong>discontinued</strong>.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;background:#fcfdff">
+        <h4>Concept check</h4>
+        <p class="muted">Pick the best answer.</p>
+        <div class="choice-wrap" id="q-cpt-1"></div>
+        <div class="feedback" id="fb-cpt-1"></div>
+      </div>
+
+      
+<div class="card" style="margin-top:16px;background:#fcfdff">
+        <h4>Build the claim story in the correct order</h4>
+        <p class="muted">Drag each card into the correct box. Think of it this way: first identify the main service, then decide whether an extra detail is needed, then explain what that extra detail changes.</p>
+        <div class="sequence-board">
+          <div class="sequence-targets">
+            <div class="sequence-slot">
+              <h5>Step 1</h5>
+              <div class="muted small">Start with the main service or procedure.</div>
+              <div class="dropzone" data-seq-slot="1"></div>
+            </div>
+            <div class="sequence-slot">
+              <h5>Step 2</h5>
+              <div class="muted small">Add a modifier only if the documentation shows a special circumstance.</div>
+              <div class="dropzone" data-seq-slot="2"></div>
+            </div>
+            <div class="sequence-slot">
+              <h5>Step 3</h5>
+              <div class="muted small">Read the code line again with the modifier so the service meaning becomes more specific.</div>
+              <div class="dropzone" data-seq-slot="3"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h5 style="margin-top:0">Drag cards from here</h5>
+            <div id="sequencePool"></div>
+          </div>
+        </div>
+        <div class="navrow" style="margin-top:12px">
+          <button class="btn gold" onclick="gradeSequence()">Check the order</button>
+          <div class="feedback" id="structureStatus" style="display:none"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(1)">← Previous</button>
+        <button class="btn" onclick="goTo(3)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="3">
+    <div class="section-shell section-theme-3">
+      <div class="section-ribbon"><span class="dot" style="background:#ff6ea8"></span> Modifier memory deck</div>
+    <div class="card">
+      <div class="section-head head-3">
+        <h3>Page 3 • Modifier memory deck</h3>
+        <p class="lede">Flip each card, then mark it: keep what you know and flag what you still need to study. Focus on the highest-yield patterns.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Flip cards</span>
+          <span class="chip">Study buckets</span>
+        </div>
+
+      <div class="flash-grid" id="flashGrid"></div>
+
+      <div class="bucket-grid" style="margin-top:18px">
+        <div class="bucket" id="knownBucket">
+          <h4>Known / feeling solid</h4>
+          <div class="muted small">Cards you marked as understood.</div>
+          <div id="knownList"></div>
+        </div>
+        <div class="bucket" id="studyBucket">
+          <h4>Still need to study</h4>
+          <div class="muted small">Cards that need another pass before simulation.</div>
+          <div id="studyList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(2)">← Previous</button>
+        <button class="btn" onclick="goTo(4)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="4">
+    <div class="section-shell section-theme-4">
+      <div class="section-ribbon"><span class="dot" style="background:#31d0aa"></span> Modifier sorting challenge</div>
+    <div class="card">
+      <div class="section-head head-4">
+        <h3>Page 4 • Modifier sorting challenge</h3>
+        <p class="lede">Classify each clue carefully. Separate look-alike modifier situations by paying attention to the exact relationship in the note.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Drag + drop</span>
+          <span class="chip">Feedback mode</span>
+        </div>
+
+      <div class="grid grid-2">
+        <div class="card" style="background:#fcfdff">
+          <h4>Drag each statement to the best bucket</h4>
+          <div class="muted small">Buckets: <strong>component / portion</strong>, <strong>same-day E/M relationship</strong>, <strong>procedure circumstance</strong>, <strong>repeat / distinctness</strong>.</div>
+          <div id="dragPool" style="margin-top:12px"></div>
+        </div>
+
+        <div class="grid">
+          <div class="bucket" data-sort-bucket="component">
+            <h4>Component / portion</h4>
+            <div class="muted small">Examples: only the professional piece, only the technical piece.</div>
+          </div>
+          <div class="bucket" data-sort-bucket="em">
+            <h4>Same-day E/M relationship</h4>
+            <div class="muted small">Examples: significant separately identifiable E/M, decision for surgery.</div>
+          </div>
+          <div class="bucket" data-sort-bucket="circumstance">
+            <h4>Procedure circumstance</h4>
+            <div class="muted small">Examples: reduced, stopped, bilateral, multiple.</div>
+          </div>
+          <div class="bucket" data-sort-bucket="repeat">
+            <h4>Repeat / distinctness</h4>
+            <div class="muted small">Examples: repeat by same provider, another provider, distinct procedural service.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="navrow" style="margin-top:12px">
+        <button class="btn gold" onclick="gradeSorter()">Check my sorting</button>
+        <div id="sorterFeedback" class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(3)">← Previous</button>
+        <button class="btn" onclick="goTo(5)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="5">
+    <div class="section-shell section-theme-5">
+      <div class="section-ribbon"><span class="dot" style="background:#ffb36b"></span> High-difficulty detective</div>
+    <div class="card">
+      <div class="section-head head-5">
+        <h3>Page 5 • High-difficulty modifier detective</h3>
+        <p class="lede">Read each note closely. Catch the tiny details and avoid near-matches by focusing on the exact wording.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">3 attempts</span>
+          <span class="chip">3 hints</span>
+          <span class="chip">Auto-reveal</span>
+        </div>
+
+      <div id="detectiveCases" class="grid"></div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(4)">← Previous</button>
+        <button class="btn" onclick="goTo(6)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="6">
+    <div class="section-shell section-theme-6">
+      <div class="section-ribbon"><span class="dot" style="background:#5ec7ff"></span> Outpatient E/M level logic</div>
+    <div class="card">
+      <div class="section-head head-6">
+        <h3>Page 6 • Outpatient E/M level logic</h3>
+        <p class="lede">Use the structure, not guesswork. Turn office/outpatient E/M level selection into a decision game and apply the 2-out-of-3 rule.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Straightforward</span>
+          <span class="chip">Low</span>
+          <span class="chip">Moderate</span>
+          <span class="chip">High</span>
+        </div>
+
+      
+<div class="grid grid-2">
+        <div class="card" style="background:#fcfdff">
+          <h4>See the 2-out-of-3 rule clearly</h4>
+          <p class="muted">Choose the level for each of the three elements. Then watch the buckets below: if <strong>2 or more</strong> elements land at the same level or higher, that becomes the overall MDM level.</p>
+          <div class="logic-board">
+            <div class="logic-row">
+              <div class="logic-label"><strong>Problems addressed</strong><div class="muted small">How complicated are the problems managed today?</div></div>
+              <div class="logic-pick">Counts as <strong>1 of the 3</strong> elements</div>
+              <div class="signal neutral">One decision piece</div>
+            </div>
+            <div class="logic-row">
+              <div class="logic-label"><strong>Data reviewed / analyzed</strong><div class="muted small">What did the clinician review, analyze, interpret, or discuss?</div></div>
+              <div class="logic-pick">Counts as <strong>1 of the 3</strong> elements</div>
+              <div class="signal neutral">One decision piece</div>
+            </div>
+            <div class="logic-row">
+              <div class="logic-label"><strong>Risk of complications / management</strong><div class="muted small">How risky were the management choices or patient situation?</div></div>
+              <div class="logic-pick">Counts as <strong>1 of the 3</strong> elements</div>
+              <div class="signal neutral">One decision piece</div>
+            </div>
+          </div>
+
+          
+<div class="bucket-bar">
+            <div class="example-card">
+              <strong>Example A</strong>
+              <div class="example-levels">
+                <span class="level-chip level-moderate">Moderate</span>
+                <span class="level-chip level-moderate">Moderate</span>
+                <span class="level-chip level-low">Low</span>
+              </div>
+              <div style="margin-top:10px"><strong>Overall level:</strong> <span class="level-chip level-moderate">Moderate</span></div>
+              <div class="muted small" style="margin-top:8px">Two of the three elements meet Moderate, so the visit is Moderate.</div>
+            </div>
+            <div class="example-card">
+              <strong>Example B</strong>
+              <div class="example-levels">
+                <span class="level-chip level-high">High</span>
+                <span class="level-chip level-low">Low</span>
+                <span class="level-chip level-low">Low</span>
+              </div>
+              <div style="margin-top:10px"><strong>Overall level:</strong> <span class="level-chip level-low">Low</span></div>
+              <div class="muted small" style="margin-top:8px">One High does not control the whole visit. Two elements support Low, so the visit stays Low.</div>
+            </div>
+            <div class="example-card">
+              <strong>Example C</strong>
+              <div class="example-levels">
+                <span class="level-chip level-straight">Straightforward</span>
+                <span class="level-chip level-straight">Straightforward</span>
+                <span class="level-chip level-low">Low</span>
+              </div>
+              <div style="margin-top:10px"><strong>Overall level:</strong> <span class="level-chip level-straight">Straightforward</span></div>
+              <div class="muted small" style="margin-top:8px">Two elements support Straightforward, so the visit remains Straightforward.</div>
+            </div>
+          </div>
+
+          
+<div class="mixer-board">
+            <h4 style="margin:0">Test the rule yourself</h4>
+            <p class="muted">Choose a level for each of the three elements, then click <strong>Calculate my overall level</strong>.</p>
+            <div class="mixer-grid">
+              <div class="mixer-col">
+                <strong>Problems addressed</strong>
+                <select class="select" id="mixProblems">
+                  <option value="Straightforward">Straightforward</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div class="mixer-col">
+                <strong>Data reviewed / analyzed</strong>
+                <select class="select" id="mixData">
+                  <option value="Straightforward">Straightforward</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div class="mixer-col">
+                <strong>Risk of complications / management</strong>
+                <select class="select" id="mixRisk">
+                  <option value="Straightforward">Straightforward</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+            </div>
+            <div class="navrow" style="margin-top:12px">
+              <button class="btn green" type="button" onclick="updateMixer()">Calculate my overall level</button>
+            </div>
+            <div class="mixer-result">
+              <div class="overall-badge">Use the real rule: <strong>2 of 3</strong> must support the level</div>
+              <div class="result-band level-straight" id="mixResultBand">Overall MDM: Straightforward</div>
+              <div class="muted" id="mixReason" style="margin-top:10px">After you choose the three element levels, calculate the overall result here.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background:#fcfdff">
+          <h4>Recognize each level fast</h4>
+          <div class="table-like">
+            <div class="tile"><strong>Straightforward</strong><div class="muted">Minimal problem burden, minimal/no data, minimal risk.</div></div>
+            <div class="tile"><strong>Low</strong><div class="muted">Limited complexity, limited data, low risk.</div></div>
+            <div class="tile"><strong>Moderate</strong><div class="muted">More involved problem work, more analysis, and/or prescription or management risk.</div></div>
+            <div class="tile"><strong>High</strong><div class="muted">Very serious complexity, threat to health, and/or high-risk decisions.</div></div>
+          </div>
+          <div class="overall-tile">
+            <div class="overall-badge">Rule to remember: <strong>2 of 3 must meet the level</strong></div>
+            <p class="muted" style="margin:.8rem 0 0">Do not let one high element trick you. One high element by itself does not make the whole visit high.</p>
+          </div>
+        </div>
+      </div>
+
+            <div class="tile"><strong>Low</strong><div class="muted">Limited problem complexity, limited data, low risk.</div></div>
+            <div class="tile"><strong>Moderate</strong><div class="muted">Multiple or more involved problems, moderate data and/or prescription or management risk.</div></div>
+            <div class="tile"><strong>High</strong><div class="muted">Serious threat / high complexity, extensive thinking burden, and/or high risk decisions.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h4>E/M builder</h4>
+        <p class="muted">Choose the level that best fits each element. The builder will tell you the overall MDM level.</p>
+
+        <div class="table-like">
+          <div class="table-row">
+            <div class="cell-head">Element</div>
+            <div class="cell-head">Your selection</div>
+            <div class="cell-head">Teaching clue</div>
+            <div class="cell-head">Why it matters</div>
+          </div>
+          <div class="table-row">
+            <div class="cell">Problems addressed</div>
+            <div class="cell">
+              <select class="select" id="mdmProblems">
+                <option value="">Choose…</option>
+                <option>Straightforward</option>
+                <option>Low</option>
+                <option>Moderate</option>
+                <option>High</option>
+              </select>
+            </div>
+            <div class="cell">How complicated are the problems actually managed today?</div>
+            <div class="cell">This is one of the three decision pillars.</div>
+          </div>
+          <div class="table-row">
+            <div class="cell">Data reviewed / analyzed</div>
+            <div class="cell">
+              <select class="select" id="mdmData">
+                <option value="">Choose…</option>
+                <option>Straightforward</option>
+                <option>Low</option>
+                <option>Moderate</option>
+                <option>High</option>
+              </select>
+            </div>
+            <div class="cell">Did the clinician review tests, external notes, independent interpretation, or discussion?</div>
+            <div class="cell">More cognitive work can raise the level.</div>
+          </div>
+          <div class="table-row">
+            <div class="cell">Risk of complications / management</div>
+            <div class="cell">
+              <select class="select" id="mdmRisk">
+                <option value="">Choose…</option>
+                <option>Straightforward</option>
+                <option>Low</option>
+                <option>Moderate</option>
+                <option>High</option>
+              </select>
+            </div>
+            <div class="cell">Was there prescription management, minor surgery decision, admission decision, or higher danger?</div>
+            <div class="cell">Risk often separates low from moderate or high.</div>
+          </div>
+        </div>
+
+        <div class="navrow" style="margin-top:14px">
+          <button class="btn green" onclick="computeMDM()">Calculate overall MDM</button>
+          <div id="mdmResult" class="feedback"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;background:#fcfdff">
+        <h4>Mini practice</h4>
+        <div class="choice-wrap" id="q-mdm-1"></div>
+        <div class="feedback" id="fb-mdm-1"></div>
+      </div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(5)">← Previous</button>
+        <button class="btn" onclick="goTo(7)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="7">
+    <div class="section-shell section-theme-7">
+      <div class="section-ribbon"><span class="dot" style="background:#7be495"></span> Mixed simulation cases</div>
+    <div class="card">
+      <div class="section-head head-7">
+        <h3>Page 7 • Mixed simulation cases</h3>
+        <p class="lede">Work through realistic mixed cases. Decide both the modifier logic and the MDM level logic inside the same workflow mindset.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Mixed reasoning</span>
+          <span class="chip">Select all that apply included</span>
+        </div>
+
+      <div id="mixedCases" class="grid"></div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(6)">← Previous</button>
+        <button class="btn" onclick="goTo(8)">Next page →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-page="8">
+    <div class="section-shell section-theme-8">
+      <div class="section-ribbon"><span class="dot" style="background:#9b5cff"></span> Summary + reflection</div>
+    <div class="card">
+      <div class="section-head head-8">
+        <h3>Page 8 • Summary + reflection</h3>
+        <p class="lede">Generate your summary, edit it in your own words, and copy it into Amplify.</p>
+      </div>
+      <div class="chips">
+          <span class="chip">Teacher-ready</span>
+          <span class="chip">Editable</span>
+          <span class="chip">Copy button</span>
+        </div>
+
+      <div class="grid grid-2">
+        <div class="card" style="background:#fcfdff">
+          <h4>Your dashboard</h4>
+          <div class="grid">
+            <div class="calc-cell">
+              <strong>Total score</strong>
+              <div class="meter" style="margin-top:8px"><span id="scoreMeter"></span></div>
+              <div class="muted small" id="scoreMeta">0 points</div>
+            </div>
+            <div class="calc-cell">
+              <strong>Accuracy</strong>
+              <div class="meter" style="margin-top:8px"><span id="accuracyMeter"></span></div>
+              <div class="muted small" id="accuracyMeta">0%</div>
+            </div>
+            <div class="calc-cell">
+              <strong>Hints used</strong>
+              <div class="meter" style="margin-top:8px"><span id="hintMeter"></span></div>
+              <div class="muted small" id="hintMeta">0 hints</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h4>Confidence check</h4>
+            <label class="muted" for="confidenceRange">How confident do you feel now?</label>
+            <input id="confidenceRange" type="range" min="1" max="5" value="3" style="width:100%;margin-top:10px" />
+            <div class="chips" style="margin-top:8px">
+              <span class="chip">1 = very unsure</span>
+              <span class="chip">5 = ready for simulation</span>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h4>Write your own reflection</h4>
+            <label class="muted">What still confuses you?</label>
+            <textarea id="confusedBox" class="summary-box" style="min-height:90px" placeholder="Write in your own words what still confuses you..."></textarea>
+            <label class="muted" style="display:block;margin-top:10px">What clicked for you? What did you learn?</label>
+            <textarea id="learnedBox" class="summary-box" style="min-height:90px" placeholder="Write in your own words what clicked for you and what you learned..."></textarea>
+          </div>
+        </div>
+
+        <div class="card" style="background:#fcfdff">
+          <h4>Generated summary</h4>
+          <button class="btn alt" onclick="generateSummary()">Generate summary</button>
+          <button class="btn ghost" onclick="copySummary()" style="margin-left:8px">Copy summary</button>
+          <textarea id="summaryOutput" class="summary-box" placeholder="Your generated summary will appear here..."></textarea>
+          <div class="legend">
+            <span class="green-bg">green = correct</span>
+            <span class="red-bg">red = incorrect</span>
+            <span class="yellow-bg">yellow = hints / caution</span>
+            <span class="blue-bg">blue = teaching / structure</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:16px">
+        <strong>Teacher note:</strong> students should complete the reflection in their own words before copying it into Amplify.
+      </div>
+    </div>
+
+    <div class="sticky-nav-bottom">
+      <div class="navrow">
+        <button class="navbtn" onclick="goTo(7)">← Previous</button>
+        <button class="btn green" onclick="celebrate()">Finish lab 🎉</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const app = {
+  score: 0,
+  correct: 0,
+  totalAnswered: 0,
+  hintsUsed: 0,
+  currentPage: 1,
+  sound: true,
+  knownCards: [],
+  studyCards: [],
+  answered: {},
+  mixedAnswered: {},
+  maxScore: 460
+};
+
+const flashcards = [
+  {mod:"24", title:"Post-op but unrelated E/M", desc:"Use when an E/M service happens during a postoperative period, but the reason for that E/M is unrelated to the original surgery.", example:"Patient returns during global period of knee surgery, but today is evaluated for new otitis media.", grad:"var(--grad1)"},
+  {mod:"25", title:"Significant separate E/M same day", desc:"Use when the E/M service is above and beyond the usual pre/intra/post work of another same-day procedure or service.", example:"Office visit with meaningful evaluation plus a minor procedure performed that same day.", grad:"var(--grad2)"},
+  {mod:"26", title:"Professional component only", desc:"Use when only the interpretation / professional portion is reported.", example:"Radiologist interprets image but does not own the equipment.", grad:"var(--grad3)"},
+  {mod:"50", title:"Bilateral procedure", desc:"Use when the same eligible procedure is performed on both sides during the same session, according to payer rules and code indicators.", example:"Procedure performed on left and right sides.", grad:"var(--grad4)"},
+  {mod:"51", title:"Multiple procedures", desc:"Used to show multiple procedures in the same session when applicable. Many payers calculate this automatically.", example:"Several procedures performed in same operative session.", grad:"var(--grad5)"},
+  {mod:"52", title:"Reduced services", desc:"Used when a service is partially reduced or less than the full usual service, but not fully stopped due to danger or extenuating circumstance.", example:"Diagnostic test only partially completed for a non-emergent reason.", grad:"var(--grad1)"},
+  {mod:"53", title:"Discontinued procedure", desc:"Use when a procedure is started but discontinued because patient well-being or extenuating circumstances make continuation unsafe or not appropriate.", example:"Procedure halted after induction due to unstable vitals.", grad:"var(--grad2)"},
+  {mod:"57", title:"Decision for major surgery", desc:"Use on an E/M service that led to the initial decision for a major surgery, generally with a 90-day global period.", example:"Surgeon evaluates acute condition and decides today to take patient to OR for major surgery.", grad:"var(--grad3)"},
+  {mod:"59", title:"Distinct procedural service", desc:"Use to show a separate, distinct procedural circumstance when procedures would otherwise bundle, and documentation truly supports distinctness.", example:"Different lesion, different site, different session, or separate injury.", grad:"var(--grad4)"},
+  {mod:"76", title:"Repeat by same provider", desc:"Use when the same physician or qualified professional repeats the procedure or service.", example:"Same provider repeats a diagnostic service later the same day.", grad:"var(--grad5)"},
+  {mod:"77", title:"Repeat by another provider", desc:"Use when a different physician or qualified professional repeats the procedure or service.", example:"Second provider repeats a study to verify findings.", grad:"var(--grad1)"},
+  {mod:"TC", title:"Technical component only", desc:"Use when only the equipment / technician / facility side of a service is billed.", example:"Facility bills technical piece of imaging; professional interpretation billed separately.", grad:"var(--grad2)"}
+];
+
+const sortingItems = [
+  {id:"s1", text:"Only the interpretation portion was provided.", bucket:"component"},
+  {id:"s2", text:"The evaluation on the same day was above and beyond the usual work bundled into the minor procedure.", bucket:"em"},
+  {id:"s3", text:"The service was repeated later by the same physician.", bucket:"repeat"},
+  {id:"s4", text:"The procedure was started, but the patient's status made continuation unsafe.", bucket:"circumstance"},
+  {id:"s5", text:"The service involved both right and left sides in the same session.", bucket:"circumstance"},
+  {id:"s6", text:"Only the equipment / technical portion was reported.", bucket:"component"},
+  {id:"s7", text:"The same family of services would normally bundle, but documentation supports a distinct encounter/site/service.", bucket:"repeat"},
+  {id:"s8", text:"The office visit resulted in the initial decision for a major surgery.", bucket:"em"}
+];
+
+const detectiveCases = [
+  {
+    id:"det1",
+    prompt:"A physician evaluates a patient in the office for worsening pain and performs a minor lesion destruction at the same visit. The record shows a separately documented history, focused exam, and assessment addressing a new complaint that required medical decision making beyond the routine work for the lesion destruction. Which modifier best supports the E/M service?",
+    options:["24","25","57","59"],
+    answer:"25",
+    rationale:"This is the classic same-day significant, separately identifiable E/M situation. The extra E/M work is beyond the usual work of the procedure.",
+    hints:[
+      "This is about an E/M on the same day as another service.",
+      "The procedure here is minor, not a major surgery decision.",
+      "Look for the modifier that says the E/M stood on its own beyond the procedure's usual work."
+    ]
+  },
+  {
+    id:"det2",
+    prompt:"During the postoperative period of a prior major surgery, the same surgeon sees the patient for evaluation of new-onset flank pain that is not related to the surgical site, the healing process, or routine global follow-up care. Which modifier most appropriately applies to the E/M service?",
+    options:["24","25","57","76"],
+    answer:"24",
+    rationale:"The E/M occurs during a postoperative period but is unrelated to the prior surgery, which points to modifier 24.",
+    hints:[
+      "Think global period.",
+      "The visit reason is unrelated to the earlier surgery.",
+      "This modifier is used only on an E/M code during post-op when the reason is unrelated."
+    ]
+  },
+  {
+    id:"det3",
+    prompt:"A diagnostic ultrasound is repeated later the same day by the same physician because the first image set was technically limited and more complete information is needed. Which modifier best communicates the repeat circumstance?",
+    options:["59","77","76","26"],
+    answer:"76",
+    rationale:"Repeat by the same physician or qualified professional points to modifier 76.",
+    hints:[
+      "This is about repetition, not distinctness.",
+      "The same physician repeated it.",
+      "76 = same provider repeat. 77 = another provider repeat."
+    ]
+  },
+  {
+    id:"det4",
+    prompt:"A radiologist supplies only the interpretation of an imaging study, while another entity bills the equipment and technical resources. Which modifier best fits the radiologist's claim line?",
+    options:["26","TC","59","52"],
+    answer:"26",
+    rationale:"Modifier 26 signals the professional component only.",
+    hints:[
+      "Think 'reading' and professional judgment.",
+      "The radiologist did not provide the equipment side.",
+      "Professional portion only."
+    ]
+  }
+];
+
+const mixedCases = [
+  {
+    id:"mix1",
+    type:"single",
+    prompt:"A clinician addresses two stable chronic illnesses, reviews an external note, reviews lab results, and continues prescription drug management. What overall office/outpatient MDM level is most likely?",
+    options:["Straightforward","Low","Moderate","High"],
+    answer:"Moderate",
+    rationale:"Prescription drug management often supports moderate risk, and the overall case commonly meets moderate when 2 of 3 elements land there."
+  },
+  {
+    id:"mix2",
+    type:"multi",
+    prompt:"Select all clues that push a case toward using modifier 25 rather than no modifier or a different modifier.",
+    options:[
+      "The E/M work is clearly separate from the usual work of the same-day procedure.",
+      "The patient is simply new to the provider.",
+      "The same-day E/M has its own medically necessary assessment and plan.",
+      "The diagnosis must be different from the procedure diagnosis.",
+      "The documentation shows significant work beyond the usual pre/intra/post work of the minor procedure."
+    ],
+    answers:[0,2,4],
+    rationale:"Modifier 25 depends on a significant, separately identifiable E/M. Being new alone is not enough, and the diagnoses do not have to be different."
+  },
+  {
+    id:"mix3",
+    type:"single",
+    prompt:"The surgeon sees a patient in the office and, based on today's assessment, makes the initial decision for a major surgery later that day. Which modifier is most relevant on the E/M code?",
+    options:["24","25","57","59"],
+    answer:"57",
+    rationale:"The decision for major surgery is the key clue for modifier 57."
+  },
+  {
+    id:"mix4",
+    type:"single",
+    prompt:"The physician begins a procedure but stops because the patient develops an acute safety concern mid-procedure. Which modifier most likely fits the procedure line?",
+    options:["52","53","51","50"],
+    answer:"53",
+    rationale:"A procedure that is discontinued for patient safety/exigent circumstances points to modifier 53, not merely reduced service."
+  }
+];
+
+// Sound
+let audioCtx = null;
+function ensureAudio(){
+  if(!app.sound) return null;
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function beep(type="good"){
+  if(!app.sound) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  if(type==="good"){
+    o.frequency.setValueAtTime(660, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + .12);
+    g.gain.setValueAtTime(.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.06, ctx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .18);
+    o.start(); o.stop(ctx.currentTime + .19);
+  }else if(type==="bad"){
+    o.frequency.setValueAtTime(260, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + .18);
+    g.gain.setValueAtTime(.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.05, ctx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .22);
+    o.start(); o.stop(ctx.currentTime + .23);
+  }else{
+    o.frequency.setValueAtTime(450, ctx.currentTime);
+    g.gain.setValueAtTime(.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.04, ctx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .1);
+    o.start(); o.stop(ctx.currentTime + .11);
+  }
+}
+
+function scrollToTop(){window.scrollTo({top:0, behavior:'smooth'})}
+
+function updateStats(){
+  document.getElementById('scoreHero').textContent = app.score;
+  document.getElementById('correctHero').textContent = app.correct;
+  document.getElementById('hintHero').textContent = app.hintsUsed;
+  document.getElementById('pageLabel').textContent = `Page ${app.currentPage} / 8`;
+  document.getElementById('bar').style.width = `${(app.currentPage-1)/7*100}%`;
+  const prevBtn = document.getElementById('topPrev');
+  if(prevBtn){
+    prevBtn.disabled = app.currentPage === 1;
+    prevBtn.style.opacity = app.currentPage === 1 ? ".45" : "1";
+  }
+}
+function goTo(page){
+  app.currentPage = page;
+  document.querySelectorAll('.section').forEach(sec=>{
+    sec.classList.toggle('active', Number(sec.dataset.page)===page);
+  });
+  updateStats();
+  scrollToTop();
+  beep("nav");
+}
+document.getElementById('jumpSummary').addEventListener('click',()=>goTo(8));
+document.getElementById('topPrev').addEventListener('click',()=>{
+  const prev = Math.max(1, app.currentPage - 1);
+  goTo(prev);
+});
+  goTo(next);
+});
+document.getElementById('soundToggle').addEventListener('click',()=>{
+  app.sound = !app.sound;
+  const btn = document.getElementById('soundToggle');
+  btn.textContent = app.sound ? "🔊 Sound On" : "🔇 Sound Off";
+  btn.classList.toggle('sound-on', app.sound);
+});
+
+// Generic scoring
+function award(points){
+  app.score += points;
+  updateStats();
+}
+function markAnswered(id, correct){
+  if(app.answered[id]) return;
+  app.answered[id] = true;
+  app.totalAnswered += 1;
+  if(correct){
+    app.correct += 1;
+    award(20);
+    beep("good");
+  }else{
+    beep("bad");
+  }
+  updateStats();
+}
+function safeMarkAttempted(id){
+  if(app.answered[id]) return false;
+  app.totalAnswered += 1;
+  app.answered[id] = "attempted";
+  return true;
+}
+
+// Page 2 question
+function renderQuestion(containerId, feedbackId, qId, prompt, options, answer, rationale){
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = `<div class="small"><strong>${prompt}</strong></div>` + options.map(opt=>`<button class="choice" data-q="${qId}" data-opt="${opt}">${opt}</button>`).join('');
+  wrap.querySelectorAll('.choice').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(btn.parentElement.dataset.locked==="1") return;
+      const all = wrap.querySelectorAll('.choice');
+      const fb = document.getElementById(feedbackId);
+      const correct = btn.dataset.opt === answer;
+      all.forEach(b=>b.disabled = true);
+      btn.parentElement.dataset.locked = "1";
+      all.forEach(b=>{
+        if(b.dataset.opt === answer) b.classList.add('correct');
+      });
+      if(!correct) btn.classList.add('wrong');
+      markAnswered(qId, correct);
+      fb.className = 'feedback ' + (correct ? 'good' : 'bad');
+      fb.innerHTML = correct
+        ? `<strong>Correct.</strong> ${rationale}`
+        : `<strong>Not quite.</strong> ${rationale}`;
+    });
+  });
+}
+renderQuestion(
+  "q-cpt-1","fb-cpt-1","cpt1",
+  "Which statement best explains what a modifier does?",
+  [
+    "It replaces the CPT code with a different category of service.",
+    "It adds extra detail to the service or circumstance without changing the base code's main identity.",
+    "It is only used when a claim is denied the first time.",
+    "It always means the payer will pay more."
+  ],
+  "It adds extra detail to the service or circumstance without changing the base code's main identity.",
+  "That is the core idea: the base code is still the main service, and the modifier adds clarifying circumstance."
+);
+
+
+// Clearer sequence builder
+const sequenceItems = [
+  {id:"seq1", text:"Choose the base CPT code for the main service or procedure.", slot:"1"},
+  {id:"seq2", text:"Add a modifier only if documentation shows a special circumstance.", slot:"2"},
+  {id:"seq3", text:"Read the full code line again so the service meaning becomes more specific.", slot:"3"}
+];
+function renderSequenceBuilder(){
+  const pool = document.getElementById("sequencePool");
+  if(!pool) return;
+  pool.innerHTML = "";
+  sequenceItems.sort(()=>Math.random()-.5).forEach(item=>{
+    const d = document.createElement("div");
+    d.className = "seq-card";
+    d.draggable = true;
+    d.id = item.id;
+    d.textContent = item.text;
+    d.addEventListener("dragstart", ev=>ev.dataTransfer.setData("text/plain", item.id));
+    pool.appendChild(d);
+  });
+  document.querySelectorAll("[data-seq-slot]").forEach(zone=>{
+    zone.addEventListener("dragover", ev=>ev.preventDefault());
+    zone.addEventListener("drop", ev=>{
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text/plain");
+      const el = document.getElementById(id);
+      if(el) zone.appendChild(el);
+      beep("nav");
+    });
+  });
+}
+function gradeSequence(){
+  const zones = [...document.querySelectorAll("[data-seq-slot]")];
+  let ok = true;
+  zones.forEach(z=>{
+    const child = z.querySelector(".seq-card");
+    if(!child || sequenceItems.find(x=>x.id===child.id)?.slot !== z.dataset.seqSlot) ok = false;
+    z.style.borderColor = ok ? "" : "";
+  });
+  const fb = document.getElementById("structureStatus");
+  fb.style.display = "block";
+  if(!app.answered["sequence1"]){ app.totalAnswered += 1; app.answered["sequence1"] = true; }
+  if(ok){
+    app.correct += 1; award(20); updateStats(); beep("good");
+    fb.className = "feedback good";
+    fb.innerHTML = "<strong>Correct.</strong> Start with the main CPT code, add a modifier only if the documentation supports it, then read the whole line again to understand the more specific meaning.";
+  }else{
+    beep("bad");
+    fb.className = "feedback bad";
+    fb.innerHTML = "<strong>Try again.</strong> First pick the main CPT service, then decide whether a modifier is needed, then interpret the full line with the modifier added.";
+  }
+}
+renderSequenceBuilder();
+
+
+// Flashcards
+function renderFlashcards(){
+  const grid = document.getElementById("flashGrid");
+  grid.innerHTML = "";
+  flashcards.forEach(card=>{
+    const div = document.createElement("div");
+    div.className = "flash";
+    div.innerHTML = `
+      <div class="flash-inner">
+        <div class="flash-face flash-front" style="background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.04)), ${card.grad};">
+          <div>
+            <h4>${card.mod}</h4>
+            <p>${card.title}</p>
+          </div>
+        </div>
+        <div class="flash-face flash-back">
+          <h4>Modifier ${card.mod}</h4>
+          <p><strong>Meaning:</strong> ${card.desc}</p>
+          <p class="muted"><strong>Example:</strong> ${card.example}</p>
+          <div class="status-row">
+            <button class="mini known" onclick="markCard('${card.mod}','known');event.stopPropagation();">I know this</button>
+            <button class="mini study" onclick="markCard('${card.mod}','study');event.stopPropagation();">Still need to study</button>
+          </div>
+        </div>
+      </div>`;
+    div.addEventListener("click",()=>{ div.classList.toggle("flipped"); beep("nav"); });
+    grid.appendChild(div);
+  });
+}
+function markCard(mod,status){
+  if(status==="known"){
+    if(!app.knownCards.includes(mod)) app.knownCards.push(mod);
+    app.studyCards = app.studyCards.filter(x=>x!==mod);
+  }else{
+    if(!app.studyCards.includes(mod)) app.studyCards.push(mod);
+    app.knownCards = app.knownCards.filter(x=>x!==mod);
+  }
+  renderBuckets();
+  beep("good");
+}
+function renderBuckets(){
+  document.getElementById("knownList").innerHTML = app.knownCards.map(m=>`<div class="drag">Modifier ${m}</div>`).join("");
+  document.getElementById("studyList").innerHTML = app.studyCards.map(m=>`<div class="drag">Modifier ${m}</div>`).join("");
+}
+renderFlashcards();
+renderBuckets();
+
+// Sorter drag/drop
+function renderDragPool(){
+  const pool = document.getElementById("dragPool");
+  pool.innerHTML = "";
+  sortingItems.forEach(item=>{
+    const d = document.createElement("div");
+    d.className = "drag";
+    d.draggable = true;
+    d.id = item.id;
+    d.textContent = item.text;
+    d.addEventListener('dragstart', ev=>ev.dataTransfer.setData("text/plain", item.id));
+    pool.appendChild(d);
+  });
+  document.querySelectorAll('[data-sort-bucket]').forEach(bucket=>{
+    bucket.addEventListener('dragover', ev=>ev.preventDefault());
+    bucket.addEventListener('drop', ev=>{
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text/plain");
+      const el = document.getElementById(id);
+      if(el) bucket.appendChild(el);
+      beep("nav");
+    });
+  });
+}
+function gradeSorter(){
+  let correctCount = 0;
+  document.querySelectorAll('[data-sort-bucket]').forEach(bucket=>{
+    const label = bucket.dataset.sortBucket;
+    [...bucket.querySelectorAll('.drag')].forEach(el=>{
+      const item = sortingItems.find(x=>x.id===el.id);
+      const ok = item && item.bucket===label;
+      el.style.borderColor = ok ? "#7ad29f" : "#f2a1af";
+      el.style.background = ok ? "#ecfff3" : "#fff0f2";
+      if(ok) correctCount++;
+    });
+  });
+  const total = sortingItems.length;
+  const fb = document.getElementById("sorterFeedback");
+  const pct = Math.round(correctCount/total*100);
+  if(!app.answered["sorter1"]){ app.totalAnswered += 1; app.answered["sorter1"] = true; }
+  if(correctCount===total){ app.correct += 1; award(30); fb.className='feedback good'; fb.innerHTML=`<strong>Excellent.</strong> You sorted all ${total} clue cards correctly.`; celebrate(); }
+  else { fb.className='feedback warn'; fb.innerHTML=`<strong>${correctCount}/${total} correct.</strong> Review the near-misses: component = 26/TC, E/M relationship = 25/57, procedure circumstance = 50/51/52/53, repeat/distinctness = 59/76/77.`; }
+  updateStats();
+}
+renderDragPool();
+
+// Detective cases
+function renderDetectiveCases(){
+  const host = document.getElementById("detectiveCases");
+  host.innerHTML = "";
+  detectiveCases.forEach(c=>{
+    const card = document.createElement("div");
+    card.className = "case-card";
+    card.innerHTML = `
+      <div class="title-row">
+        <h4>Case ${c.id.slice(-1)}</h4>
+        <div class="chip attempts" id="${c.id}-attempts">Attempts left: 3</div>
+      </div>
+      <div class="complex" style="margin-top:10px">${c.prompt}</div>
+      <div class="choice-wrap" id="${c.id}-choices"></div>
+      <div class="hint-list">
+        ${c.hints.map((h,i)=>`<div class="hint" id="${c.id}-hint-${i}"><strong>Hint ${i+1}:</strong> ${h}</div>`).join('')}
+      </div>
+      <div class="navrow">
+        <button class="mini" onclick="useHint('${c.id}')">Use a hint</button>
+        <button class="mini" onclick="revealDetective('${c.id}')">Reveal answer</button>
+      </div>
+      <div class="feedback" id="${c.id}-fb"></div>
+    `;
+    host.appendChild(card);
+    const choices = card.querySelector(`#${c.id}-choices`);
+    choices.innerHTML = c.options.map(opt=>`<button class="choice" data-case="${c.id}" data-opt="${opt}">${opt}</button>`).join("");
+    c.tries = 3; c.hintIndex = 0; c.done = false;
+    choices.querySelectorAll('.choice').forEach(btn=>{
+      btn.addEventListener('click',()=>answerDetective(c.id, btn.dataset.opt));
+    });
+  });
+}
+function answerDetective(id,opt){
+  const c = detectiveCases.find(x=>x.id===id);
+  if(!c || c.done) return;
+  const fb = document.getElementById(`${id}-fb`);
+  const buttons = document.querySelectorAll(`#${id}-choices .choice`);
+  if(opt===c.answer){
+    buttons.forEach(b=>{
+      if(b.dataset.opt===c.answer) b.classList.add('correct');
+      b.disabled = true;
+    });
+    fb.className = "feedback good";
+    fb.innerHTML = `<strong>Correct.</strong> ${c.rationale}`;
+    c.done = true;
+    markAnswered(id,true);
+  }else{
+    c.tries -= 1;
+    const clicked = [...buttons].find(b=>b.dataset.opt===opt);
+    if(clicked) clicked.classList.add('wrong');
+    document.getElementById(`${id}-attempts`).textContent = `Attempts left: ${c.tries}`;
+    if(c.tries <= 0){
+      revealDetective(id, true);
+      return;
+    }
+    if(!app.answered[id] && app.answered[id] !== true){ /* no-op */ }
+    fb.className = "feedback bad";
+    fb.innerHTML = `<strong>Not quite.</strong> Pay attention to the exact relationship in the note. You still have ${c.tries} attempt(s).`;
+    beep("bad");
+  }
+}
+function useHint(id){
+  const c = detectiveCases.find(x=>x.id===id);
+  if(!c || c.done) return;
+  if(c.hintIndex < c.hints.length){
+    document.getElementById(`${id}-hint-${c.hintIndex}`).style.display = "block";
+    c.hintIndex += 1;
+    app.hintsUsed += 1;
+    updateStats();
+    beep("nav");
+  }else{
+    const fb = document.getElementById(`${id}-fb`);
+    fb.className = "feedback warn";
+    fb.innerHTML = `<strong>All hints used.</strong> If you are still stuck, reveal the answer and study the clue words.`;
+  }
+}
+function revealDetective(id,fromAuto=false){
+  const c = detectiveCases.find(x=>x.id===id);
+  if(!c || c.done) return;
+  const buttons = document.querySelectorAll(`#${id}-choices .choice`);
+  buttons.forEach(b=>{
+    if(b.dataset.opt===c.answer) b.classList.add('correct','reveal-correct');
+    else if(b.classList.contains('wrong')) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById(`${id}-fb`);
+  fb.className = "feedback warn";
+  fb.innerHTML = `<strong>${fromAuto ? "Answer revealed after 3 attempts." : "Answer revealed."}</strong> Correct answer: <strong>${c.answer}</strong>. ${c.rationale}`;
+  c.done = true;
+  if(!app.answered[id]){ app.totalAnswered += 1; app.answered[id] = "revealed"; }
+  updateStats();
+}
+renderDetectiveCases();
+
+// MDM builder
+const mdmOrder = ["Straightforward","Low","Moderate","High"];
+
+function computeMDM(){
+  const vals = [
+    document.getElementById('mdmProblems').value,
+    document.getElementById('mdmData').value,
+    document.getElementById('mdmRisk').value
+  ];
+  const fb = document.getElementById('mdmResult');
+  if(vals.some(v=>!v)){
+    fb.className = "feedback warn";
+    fb.innerHTML = "Choose a level for all three elements first.";
+    return;
+  }
+  let result = "Straightforward";
+  for(let i=mdmOrder.length-1; i>=0; i--){
+    const level = mdmOrder[i];
+    const meetsOrHigher = vals.filter(v=>mdmOrder.indexOf(v) >= i).length;
+    if(meetsOrHigher >= 2){ result = level; break; }
+  }
+  const boxes = vals.map(v => {
+    const meets = mdmOrder.indexOf(v) >= mdmOrder.indexOf(result);
+    return `<div class="bucket-slot ${meets ? 'active' : 'inactive'}">
+      <div><strong>${v}</strong></div>
+      <div class="small" style="margin-top:6px">${meets ? 'Counts toward the final level' : 'Does not control the final level'}</div>
+    </div>`;
+  }).join("");
+  const countToward = vals.filter(v=>mdmOrder.indexOf(v) >= mdmOrder.indexOf(result)).length;
+  fb.className = "feedback good";
+  fb.innerHTML = `
+    <strong>Overall MDM = ${result}</strong>
+    <div class="bucket-bar" style="margin-top:12px">${boxes}</div>
+    <div class="overall-tile">
+      <div class="overall-badge">${countToward} of the 3 elements meet <strong>${result}</strong> or higher</div>
+      <p class="muted" style="margin:.8rem 0 0">That is why the overall level is <strong>${result}</strong>. Remember: one high element alone does not decide the whole visit.</p>
+    </div>`;
+  if(!app.answered["mdmBuilder"]){ app.totalAnswered += 1; app.correct += 1; app.answered["mdmBuilder"] = true; award(20); updateStats(); }
+  beep("good");
+}
+
+
+function levelClass(level){
+  if(level === "Straightforward") return "level-straight";
+  if(level === "Low") return "level-low";
+  if(level === "Moderate") return "level-moderate";
+  return "level-high";
+}
+function computeOverallLevel(vals){
+  let result = "Straightforward";
+  for(let i=mdmOrder.length-1; i>=0; i--){
+    const level = mdmOrder[i];
+    const meetsOrHigher = vals.filter(v=>mdmOrder.indexOf(v) >= i).length;
+    if(meetsOrHigher >= 2){ result = level; break; }
+  }
+  return result;
+}
+function updateMixer(){
+  const problems = document.getElementById('mixProblems');
+  const data = document.getElementById('mixData');
+  const risk = document.getElementById('mixRisk');
+  const band = document.getElementById('mixResultBand');
+  const reason = document.getElementById('mixReason');
+  if(!problems || !data || !risk || !band || !reason) return;
+
+  const vals = [problems.value, data.value, risk.value];
+  const result = computeOverallLevel(vals);
+  const countToward = vals.filter(v=>mdmOrder.indexOf(v) >= mdmOrder.indexOf(result)).length;
+
+  band.className = "result-band " + levelClass(result);
+  band.textContent = `Overall MDM: ${result}`;
+  reason.innerHTML = `${countToward} of the 3 elements meet <strong>${result}</strong> or higher. That is why the overall level is <strong>${result}</strong>.`;
+}
+window.addEventListener('load', function(){
+  updateMixer();
+});
+
+renderQuestion(
+  "q-mdm-1","fb-mdm-1","mdm1",
+  "Which statement is the best shortcut for office/outpatient MDM chosen by medical decision making?",
+  [
+    "Whichever single element is highest automatically decides the level.",
+    "The level is based on 2 of 3 elements: problems, data, and risk.",
+    "Only the number of diagnoses matters.",
+    "Only time matters for office visits."
+  ],
+  "The level is based on 2 of 3 elements: problems, data, and risk.",
+  "That is the structural rule students need to remember when selecting an office/outpatient visit level by MDM."
+);
+
+// Mixed cases
+function renderMixedCases(){
+  const host = document.getElementById("mixedCases");
+  host.innerHTML = "";
+  mixedCases.forEach(c=>{
+    const card = document.createElement("div");
+    card.className = "case-card";
+    let body = `<div class="complex">${c.prompt}</div>`;
+    if(c.type==="single"){
+      body += `<div class="choice-wrap" id="${c.id}-choices">${c.options.map(opt=>`<button class="choice" data-id="${c.id}" data-opt="${opt}">${opt}</button>`).join("")}</div>`;
+    }else{
+      body += `<div class="choice-wrap" id="${c.id}-choices">${c.options.map((opt,i)=>`<label class="choice" style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" data-id="${c.id}" data-idx="${i}" /> <span>${opt}</span></label>`).join("")}</div>
+      <div class="navrow"><button class="btn gold" onclick="gradeMulti('${c.id}')">Check select-all-that-apply</button></div>`;
+    }
+    body += `<div class="feedback" id="${c.id}-fb"></div>`;
+    card.innerHTML = `<h4>${c.id.toUpperCase()}</h4>${body}`;
+    host.appendChild(card);
+
+    if(c.type==="single"){
+      card.querySelectorAll('.choice').forEach(btn=>{
+        btn.addEventListener('click',()=>gradeSingleMixed(c.id, btn.dataset.opt));
+      });
+    }
+  });
+}
+function gradeSingleMixed(id,opt){
+  const c = mixedCases.find(x=>x.id===id);
+  if(app.mixedAnswered[id]) return;
+  const wrap = document.getElementById(`${id}-choices`);
+  const buttons = wrap.querySelectorAll('.choice');
+  buttons.forEach(b=>b.disabled = true);
+  buttons.forEach(b=>{ if(b.dataset.opt===c.answer) b.classList.add('correct'); });
+  const correct = opt===c.answer;
+  if(!correct){
+    [...buttons].find(b=>b.dataset.opt===opt)?.classList.add('wrong');
+  }
+  const fb = document.getElementById(`${id}-fb`);
+  fb.className = 'feedback ' + (correct ? 'good' : 'bad');
+  fb.innerHTML = (correct ? `<strong>Correct.</strong> ` : `<strong>Not quite.</strong> `) + c.rationale;
+  app.mixedAnswered[id] = true;
+  markAnswered(id,correct);
+}
+function gradeMulti(id){
+  const c = mixedCases.find(x=>x.id===id);
+  if(app.mixedAnswered[id]) return;
+  const checks = [...document.querySelectorAll(`#${id}-choices input[type="checkbox"]`)];
+  const selected = checks.filter(ch=>ch.checked).map(ch=>Number(ch.dataset.idx));
+  const setA = new Set(selected);
+  const setB = new Set(c.answers);
+  let correct = selected.length===c.answers.length && c.answers.every(i=>setA.has(i));
+  checks.forEach(ch=>{
+    const idx = Number(ch.dataset.idx);
+    const label = ch.closest('.choice');
+    if(setB.has(idx)) label.classList.add('correct');
+    if(ch.checked && !setB.has(idx)) label.classList.add('wrong');
+    ch.disabled = true;
+  });
+  const fb = document.getElementById(`${id}-fb`);
+  fb.className = 'feedback ' + (correct ? 'good' : 'warn');
+  fb.innerHTML = (correct ? `<strong>Correct.</strong> ` : `<strong>Review the pattern.</strong> `) + c.rationale;
+  app.mixedAnswered[id] = true;
+  markAnswered(id,correct);
+}
+renderMixedCases();
+
+// Summary
+function generateSummary(){
+  const confidence = Number(document.getElementById('confidenceRange').value);
+  const confused = document.getElementById('confusedBox').value.trim() || "[Student should add this in their own words.]";
+  const learned = document.getElementById('learnedBox').value.trim() || "[Student should add this in their own words.]";
+  document.getElementById('confidenceHero').textContent = confidence + "/5";
+
+  const accuracy = app.totalAnswered ? Math.round(app.correct / app.totalAnswered * 100) : 0;
+  document.getElementById('scoreMeter').style.width = `${Math.min(100, Math.round(app.score / app.maxScore * 100))}%`;
+  document.getElementById('accuracyMeter').style.width = `${accuracy}%`;
+  document.getElementById('hintMeter').style.width = `${Math.min(100, app.hintsUsed*10)}%`;
+  document.getElementById('scoreMeta').textContent = `${app.score} points`;
+  document.getElementById('accuracyMeta').textContent = `${accuracy}% based on completed graded items`;
+  document.getElementById('hintMeta').textContent = `${app.hintsUsed} hint(s) used`;
+
+  const known = app.knownCards.length ? app.knownCards.join(", ") : "none marked yet";
+  const study = app.studyCards.length ? app.studyCards.join(", ") : "none marked yet";
+
+  const strengths = [];
+  if(app.correct >= 7) strengths.push("good pattern recognition with modifier distinctions");
+  if(app.knownCards.length >= 6) strengths.push("a solid initial memory base for key modifiers");
+  if(app.score >= 180) strengths.push("strong engagement across the lab");
+  if(confidence >= 4) strengths.push("stronger readiness for the simulation lab");
+
+  const needs = [];
+  if(app.hintsUsed >= 3) needs.push("more practice with high-difficulty wording");
+  if(app.studyCards.length >= 4) needs.push("another review of several modifiers");
+  if(confidence <= 2) needs.push("more guided practice before simulation");
+  if(accuracy < 70) needs.push("more repetition with modifier clue words and E/M level logic");
+
+  const text = 
+`Simulation Lab Summary – CPT Modifiers / Outpatient E/M
+
+Student score: ${app.score}
+Accuracy: ${accuracy}%
+Hints used: ${app.hintsUsed}
+Confidence level: ${confidence}/5
+
+What I practiced:
+- CPT foundation concepts
+- Modifier clue recognition
+- Dense note interpretation
+- Office/outpatient E/M level logic
+
+Modifiers I marked as stronger:
+${known}
+
+Modifiers I still need to review:
+${study}
+
+Strengths from this practice:
+- ${strengths.length ? strengths.join("; ") : "[Add your own words here.]"}
+
+What I still need to strengthen:
+- ${needs.length ? needs.join("; ") : "[Add your own words here.]"}
+
+What still confuses me:
+${confused}
+
+What clicked for me / What I learned:
+${learned}`;
+  document.getElementById('summaryOutput').value = text;
+  beep("good");
+}
+function copySummary(){
+  const box = document.getElementById('summaryOutput');
+  box.select();
+  document.execCommand('copy');
+  beep("good");
+}
+
+// Fireworks
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+addEventListener('resize', resizeCanvas); resizeCanvas();
+
+function spawnFirework(x = Math.random()*canvas.width, y = Math.random()*canvas.height*0.55){
+  const colors = ['#7c4dff','#5ec7ff','#31d0aa','#ffd166','#ff6ea8','#ff8c42'];
+  for(let i=0;i<54;i++){
+    const angle = Math.random()*Math.PI*2;
+    const speed = Math.random()*4+1.5;
+    particles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      life:Math.random()*50+40,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      size:Math.random()*3+1.5
+    });
+  }
+}
+function animateFireworks(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.02;
+    p.life -= 1;
+    ctx.globalAlpha = Math.max(0,p.life/90);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fill();
+  });
+  particles = particles.filter(p=>p.life>0);
+  requestAnimationFrame(animateFireworks);
+}
+animateFireworks();
+
+function celebrate(){
+  award(10);
+  for(let i=0;i<4;i++){
+    setTimeout(()=>spawnFirework(), i*180);
+  }
+  beep("good");
+  beep("good");
+  updateStats();
+}
+
+updateStats();
+</script>
+</body>
+</html>
